@@ -179,7 +179,7 @@ puts ""
 # Query the movies data and loop through the results to display the movies output.
 # TODO!
 
-# Query all movies
+# Query all movies (Leigh remember to use singular)
 movies = Movie.includes(:studio).all
 
 # Loop through each movie and print details
@@ -206,4 +206,5 @@ movies.each do |movie|
     puts "#{movie.title.ljust(30)} #{casting.actor.name.ljust(25)} #{casting.actor.role}"
   end
 end
+
 
