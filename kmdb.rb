@@ -75,14 +75,101 @@
 
 # Delete existing data, so you'll start fresh each time this script is run.
 # Use `Model.destroy_all` code.
-# TODO!
+# TODO! 
+
+Movie.destroy_all
+Actor.destroy_all
+Studio.destroy_all
 
 # Generate models and tables, according to the domain model.
 # TODO!
 
+# (Leigh note) Below is what I entered in my terminal 
+
+# rails generate model Movie title:string year:integer rating:string studio:references
+# rails generate model Actor name:string
+# rails generate model Studio name:string
+# rails generate model Casting movie:references actor:references top_billed:boolean
+
+# rails db:migrate
+
+# app/models/movie.rb
+class Movie < ApplicationRecord
+    belongs_to :studio
+    has_many :castings
+    has_many :actors, through: :castings
+  end
+  
+  # app/models/actor.rb
+  class Actor < ApplicationRecord
+    has_many :castings
+    has_many :movies, through: :castings
+  end
+  
+  # app/models/studio.rb
+  class Studio < ApplicationRecord
+    has_many :movies
+  end
+  
+  # app/models/casting.rb
+  class Casting < ApplicationRecord
+    belongs_to :movie
+    belongs_to :actor
+  end
+  
+
 # Insert data into the database that reflects the sample data shown above.
 # Do not use hard-coded foreign key IDs.
 # TODO!
+
+# Assuming models: Movie, Actor, Studio, Casting
+Movie.destroy_all
+Actor.destroy_all
+Studio.destroy_all
+Casting.destroy_all
+
+# Create Studio
+warner_bros = Studio.create(name: "Warner Bros")
+
+# Create Movies (In this case only three)
+batman_begins = Movie.create(title: "Batman Begins", year: 2005, rating: "PG-13", studio: warner_bros)
+dark_knight = Movie.create(title: "The Dark Knight", year: 2008, rating: "PG-13", studio: warner_bros)
+dark_knight_rises = Movie.create(title: "The Dark Knight Rises", year: 2012, rating: "PG-13", studio: warner_bros)
+
+# Create Actors
+christian_bale = Actor.create(name: "Christian Bale")
+michael_caine = Actor.create(name: "Michael Caine")
+liam_neeson = Actor.create(name: "Liam Neeson")
+katie_holmes = Actor.create(name: "Katie Holmes")
+gary_oldman = Actor.create(name: "Gary Oldman")
+heath_ledger = Actor.create(name: "Heath Ledger")
+aaron_eckhart = Actor.create(name: "Aaron Eckhart")
+maggie_gyllenhaal = Actor.create(name: "Maggie Gyllenhaal")
+tom_hardy = Actor.create(name: "Tom Hardy")
+joseph_gordon_levitt = Actor.create(name: "Joseph Gordon-Levitt")
+anne_hathaway = Actor.create(name: "Anne Hathaway")
+
+# Batman Begins Castings
+Casting.create(movie: batman_begins, actor: christian_bale, top_billed: true)
+Casting.create(movie: batman_begins, actor: michael_caine, top_billed: true)
+Casting.create(movie: batman_begins, actor: liam_neeson, top_billed: true)
+Casting.create(movie: batman_begins, actor: katie_holmes, top_billed: true)
+Casting.create(movie: batman_begins, actor: gary_oldman, top_billed: true)
+
+# The Dark Knight Castings
+Casting.create(movie: dark_knight, actor: christian_bale, top_billed: true)
+Casting.create(movie: dark_knight, actor: heath_ledger, top_billed: true)
+Casting.create(movie: dark_knight, actor: aaron_eckhart, top_billed: true)
+Casting.create(movie: dark_knight, actor: michael_caine, top_billed: true)
+Casting.create(movie: dark_knight, actor: maggie_gyllenhaal, top_billed: true)
+
+# The Dark Knight Rises Castings
+Casting.create(movie: dark_knight_rises, actor: christian_bale, top_billed: true)
+Casting.create(movie: dark_knight_rises, actor: gary_oldman, top_billed: true)
+Casting.create(movie: dark_knight_rises, actor: tom_hardy, top_billed: true)
+Casting.create(movie: dark_knight_rises, actor: joseph_gordon_levitt, top_billed: true)
+Casting.create(movie: dark_knight_rises, actor: anne_hathaway, top_billed: true)
+
 
 # Prints a header for the movies output
 puts "Movies"
@@ -92,6 +179,14 @@ puts ""
 # Query the movies data and loop through the results to display the movies output.
 # TODO!
 
+# Query all movies
+movies = Movie.includes(:studio).all
+
+# Loop through each movie and print details
+movies.each do |movie|
+  puts "#{movie.title.ljust(30)} #{movie.year.to_s.ljust(15)} #{movie.rating.ljust(10)} #{movie.studio.name}"
+end
+
 # Prints a header for the cast output
 puts ""
 puts "Top Cast"
@@ -100,3 +195,15 @@ puts ""
 
 # Query the cast data and loop through the results to display the cast output for each movie.
 # TODO!
+
+# Query all movies and include castings and actors
+movies = Movie.includes(castings: :actor).all
+
+# Loop through each movie
+movies.each do |movie|
+  # Print each actor and their role in the movie
+  movie.castings.each do |casting|
+    puts "#{movie.title.ljust(30)} #{casting.actor.name.ljust(25)} #{casting.actor.role}"
+  end
+end
+
